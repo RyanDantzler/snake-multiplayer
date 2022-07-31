@@ -5,7 +5,7 @@ let gameActive = false;
 // const CORRECT_COLOR = '#f4f';
 // const WRONG_COLOR = '#4ff';
 
-const socket = io('http://localhost:3000');
+const socket = io('https://desolate-sea-20141.herokuapp.com/');
 
 socket.on('init', handleInit);
 socket.on('gameState', handleGameState);
