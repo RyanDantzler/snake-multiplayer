@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Game</title>
+    <style>
+        #gameScreen {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="initialScreen">
+        <h1>Multiplayer Snake</h1>
+        <button type="submit" id="newGameButton">Create New Game</button>
+        <div>OR</div>
+        <div>
+            <input type="text" placeholder="Enter Game Code" id="gameCodeInput"/>
+        </div>
+        <button type="submit" id="joinGameButton">Join Game</button>
+    </div>
+
+    <div id="gameScreen">
+        <h1>Your game code is: <span id="gameCodeDisplay"></span></h1>
+        <div>
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
