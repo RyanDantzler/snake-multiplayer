@@ -3,17 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multiplayer Game</title>
-    <style>
-        #gameScreen {
-            display: none;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Multiplayer Snake</title>
+    <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
+    <h1>Multiplayer Snake</h1>
     <div id="initialScreen">
-        <h1>Multiplayer Snake</h1>
         <button type="submit" id="newGameButton">Create New Game</button>
         <div>OR</div>
         <div>
@@ -23,9 +19,19 @@
     </div>
 
     <div id="gameScreen">
-        <h1>Your game code is: <span id="gameCodeDisplay"></span></h1>
+        <h2 id="gameCode">Your game code is: <span id="gameCodeDisplay"></span></h2>
+        <h2 id="gameScore">
+            <div>Player 1: <span id="scoreOne">0</span></div> 
+            <div>Player 2: <span id="scoreTwo">0</span></div>
+        </h2>
         <div>
             <canvas id="canvas"></canvas>
+        </div>
+        <div class="buttons">
+            <button id="btn-up" class="container"><div class="container__triangle container__triangle--up"></div></button>
+            <button id="btn-left" class="container"><div class="container__triangle container__triangle--left"></div></button>
+            <button id="btn-right" class="container"><div class="container__triangle container__triangle--right"></div></button>
+            <button id="btn-down" class="container"><div class="container__triangle container__triangle--down"></div></button> 
         </div>
     </div>
     

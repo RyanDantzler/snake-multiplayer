@@ -2,6 +2,7 @@ const BG_COLOR = '#333';
 const FOOD_COLOR = '#faf';
 const SNAKE_COLOR = '#aff';
 let gameActive = false;
+let initialPaint = true;
 // const CORRECT_COLOR = '#f4f';
 // const WRONG_COLOR = '#4ff';
 
@@ -20,6 +21,10 @@ const newGameBtn = document.getElementById('newGameButton');
 const joinGameBtn = document.getElementById('joinGameButton');
 const gameCodeInput = document.getElementById('gameCodeInput');
 const gameCodeDisplay = document.getElementById('gameCodeDisplay');
+const gameCode = document.getElementById('gameCode');
+const gameScore = document.getElementById('gameScore');
+const player1Score = document.getElementById('scoreOne');
+const player2Score = document.getElementById('scoreTwo');
 
 newGameBtn.addEventListener('click', newGame);
 joinGameBtn.addEventListener('click', joinGame);
@@ -65,6 +70,10 @@ function init() {
 
     document.addEventListener('click', handleClick);
     document.addEventListener('keydown', handleKeydown);
+    document.getElementById('btn-up').addEventListener('click', () => handleButtonClick('up'));
+    document.getElementById('btn-down').addEventListener('click', () => handleButtonClick('down'));
+    document.getElementById('btn-left').addEventListener('click', () => handleButtonClick('left'));
+    document.getElementById('btn-right').addEventListener('click', () => handleButtonClick('right'));
 
     gameActive = true;
 }
@@ -77,7 +86,36 @@ function handleKeydown(e) {
     socket.emit('keydown', e.keyCode);
 }
 
+function handleButtonClick(direction) {
+    let keycode = 0;
+
+    switch (direction) {
+        case 'left':
+            keycode = 37;
+            break;
+        case 'up':
+            keycode = 38;
+            break;
+        case 'right':
+            keycode = 39;
+            break;
+        case 'down':
+            keycode = 40;
+            break;
+        default:
+            break;
+    }
+    // console.log(keycode);
+    socket.emit('keydown', keycode);
+}
+
 function paintGame(state) {
+    if (initialPaint) {
+        gameCode.style.display = "none";
+        gameScore.style.display = "block";
+        initialPaint = false;
+    }
+
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -90,6 +128,7 @@ function paintGame(state) {
 
     paintPlayer(state.players[0], size, SNAKE_COLOR);
     paintPlayer(state.players[1], size, 'blue');
+    updateScore(state);
 }
 
 function paintPlayer(playerState, size, color) {
@@ -147,6 +186,11 @@ function handleUnknownGame() {
 function handleTooManyPlayers() {
     reset();
     alert("This game is already in progress.");
+}
+
+function updateScore(state) {
+    player1Score.innerText = state.players[0].score;
+    player2Score.innerText = state.players[1].score;
 }
 
 function reset() {
