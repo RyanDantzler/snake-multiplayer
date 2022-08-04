@@ -1,4 +1,12 @@
-const io = require('socket.io')();
+const { createServer } = require('http');
+
+const httpServer = createServer();
+const io = require('socket.io')(httpServer, {
+    cors: {
+        credentials: true,
+        origin: "https://boisterous-syrniki-4eeaa2.netlify.app"
+      }
+});
 const { initGame, gameLoop, getUpdatedVelocity } = require('./game');
 const { FRAME_RATE } = require('./constants');
 const { generateRoomId } = require('./utils');
@@ -26,14 +34,9 @@ io.on('connection', client => {
     function handleJoinGame(gameCode) {
         const room = io.sockets.adapter.rooms[gameCode];
 
-        let allUsers;
-        if (room) {
-            allUsers = room.sockets;
-        }
-
         let numClients = 0;
-        if (allUsers) {
-            numClients = Object.keys(allUsers).length;
+        if (room) {
+            numClients = room.size;
         }
 
         if (numClients === 0) {
@@ -99,4 +102,4 @@ function emitGameOver(roomId, winner) {
         .emit('gameOver', JSON.stringify({ winner }));
 }
 
-io.listen(process.env.PORT || 3000);
+httpServer.listen(process.env.PORT || 3000);
