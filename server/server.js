@@ -32,7 +32,7 @@ io.on('connection', client => {
     }
 
     function handleJoinGame(gameCode) {
-        const room = io.sockets.adapter.rooms[gameCode];
+        const room = io.sockets.adapter.rooms.get(gameCode);
 
         let numClients = 0;
         if (room) {
