@@ -3,6 +3,7 @@ const FOOD_COLOR = '#faf';
 const SNAKE_COLOR = '#aff';
 let gameActive = false;
 let initialPaint = true;
+let gameRoom;
 // const CORRECT_COLOR = '#f4f';
 // const WRONG_COLOR = '#4ff';
 
@@ -14,6 +15,7 @@ socket.on('gameOver', handleGameOver);
 socket.on('gameCode', handleGameCode);
 socket.on('unknownGame', handleUnknownGame);
 socket.on('tooManyPlayers', handleTooManyPlayers);
+socket.on('rematch', handleRestart);
 
 const gameScreen = document.getElementById('gameScreen');
 const initialScreen = document.getElementById('initialScreen');
@@ -25,9 +27,11 @@ const gameCode = document.getElementById('gameCode');
 const gameScore = document.getElementById('gameScore');
 const player1Score = document.getElementById('scoreOne');
 const player2Score = document.getElementById('scoreTwo');
+const rematchButton = document.getElementById('rematchButton');
 
 newGameBtn.addEventListener('click', newGame);
 joinGameBtn.addEventListener('click', joinGame);
+rematchButton.addEventListener('click', handleRematch);
 
 function newGame() {
     socket.emit('newGame');
@@ -37,6 +41,19 @@ function newGame() {
 function joinGame() {
     const code = gameCodeInput.value;
     socket.emit('joinGame', code);
+    gameRoom = code;
+    init();
+}
+
+function handleRematch() {
+    player1Score.innerText = 0;
+    player2Score.innerText = 0;
+
+    socket.emit('rematchGame', gameRoom);
+    init();
+}
+
+function handleRestart() {
     init();
 }
 
@@ -46,6 +63,7 @@ let playerNumber;
 function init() {
     initialScreen.style.display = "none";
     gameScreen.style.display = "block";
+    rematchButton.style.display = "none";
 
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
@@ -68,12 +86,14 @@ function init() {
     // ctx.fillRect((canvas.width - textDim.width) / 2, (canvas.height / 2) - textDim.actualBoundingBoxAscent, 190, textDim.actualBoundingBoxAscent + textDim.actualBoundingBoxDescent);
     // ctx.globalCompositeOperation = 'source-over';
 
-    document.addEventListener('click', handleClick);
-    document.addEventListener('keydown', handleKeydown);
-    document.getElementById('btn-up').addEventListener('click', () => handleButtonClick('up'));
-    document.getElementById('btn-down').addEventListener('click', () => handleButtonClick('down'));
-    document.getElementById('btn-left').addEventListener('click', () => handleButtonClick('left'));
-    document.getElementById('btn-right').addEventListener('click', () => handleButtonClick('right'));
+    if (initialPaint) {
+        document.addEventListener('click', handleClick);
+        document.addEventListener('keydown', handleKeydown);
+        document.getElementById('btn-up').addEventListener('click', () => handleButtonClick('up'));
+        document.getElementById('btn-down').addEventListener('click', () => handleButtonClick('down'));
+        document.getElementById('btn-left').addEventListener('click', () => handleButtonClick('left'));
+        document.getElementById('btn-right').addEventListener('click', () => handleButtonClick('right'));
+    }
 
     gameActive = true;
 }
@@ -166,16 +186,19 @@ function handleGameOver(data) {
     } else {
         text = 'You lose.';
     }
-    const textDim = ctx.measureText(text);
+
+    // const textDim = ctx.measureText(text);
     ctx.fillStyle = SNAKE_COLOR;
     // ctx.fillText("width:" + textDim.width, canvas.width / 2, 50);
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
+    rematchButton.style.display = "block";
     gameActive = false;
 }
 
 function handleGameCode(gameCode) {
     gameCodeDisplay.innerText = gameCode;
+    gameRoom = gameCode;
 }
 
 function handleUnknownGame() {

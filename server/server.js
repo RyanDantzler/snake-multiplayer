@@ -18,6 +18,7 @@ io.on('connection', client => {
     client.on('keydown', handleKeydown);
     client.on('newGame', handleNewGame);
     client.on('joinGame', handleJoinGame);
+    client.on('rematchGame', handleRematch);
 
     function handleNewGame() {
         let roomId = generateRoomId(5);
@@ -56,6 +57,21 @@ io.on('connection', client => {
         startGameInterval(gameCode);
     }
 
+    function handleRematch(gameCode) {
+        const room = io.sockets.adapter.rooms.get(gameCode);
+
+        let numClients = 0;
+        if (room) {
+            numClients = room.size;
+        }
+
+        if (numClients == 2) {
+            state[gameCode] = initGame();
+            io.sockets.in(gameCode).emit('rematch');
+            startGameInterval(gameCode);
+        }
+    }
+
     function handleKeydown(keyCode) {         
         const roomId = clientRooms[client.id];
 
@@ -70,7 +86,7 @@ io.on('connection', client => {
             return;
         }
     
-        const vel = getUpdatedVelocity(keyCode);
+        const vel = getUpdatedVelocity(state[roomId].players[client.number - 1], keyCode);
     
         if (vel) {
             state[roomId].players[client.number - 1].vel = vel;

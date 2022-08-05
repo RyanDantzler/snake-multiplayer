@@ -11,10 +11,8 @@
     <h1>Multiplayer Snake</h1>
     <div id="initialScreen">
         <button type="submit" id="newGameButton">Create New Game</button>
-        <div>OR</div>
-        <div>
-            <input type="text" placeholder="Enter Game Code" id="gameCodeInput"/>
-        </div>
+        <div class="textDiv">OR</div>
+        <input type="text" placeholder="Enter Game Code" id="gameCodeInput"/>
         <button type="submit" id="joinGameButton">Join Game</button>
     </div>
 
@@ -33,6 +31,7 @@
             <button id="btn-right" class="container"><div class="container__triangle container__triangle--right"></div></button>
             <button id="btn-down" class="container"><div class="container__triangle container__triangle--down"></div></button> 
         </div>
+        <button id="rematchButton">Rematch</button>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
