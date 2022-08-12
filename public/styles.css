@@ -69,7 +69,7 @@ canvas {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    padding: 7px;
+    padding: 0 7px;
 }
 
 #gameScore {
@@ -79,6 +79,14 @@ canvas {
 #gameScore div {
     display: inline-block;
     padding: 0 15px;
+}
+
+.current-player {
+    color: #aaffff;
+}
+
+.opponent-player {
+    color: #ffcd00;
 }
 
 .button {
@@ -115,9 +123,7 @@ canvas {
 }
 
 #rematchButton {
-    display: none;
-    position: absolute;
-    bottom: 15px;
+    visibility: hidden;
 }
 
 #gameArea {
