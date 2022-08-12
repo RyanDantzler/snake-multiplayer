@@ -52,16 +52,43 @@ canvas {
 }
 
 #initialScreen {
-    height: 420px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
 }
 
+body:before {
+    content: '';
+    background: url(https://cdn-icons-png.flaticon.com/512/1393/1393556.png);
+    position: absolute;
+    top: 0px;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-size: 146px;
+    background-position: -29px -24px;
+    background-repeat: repeat;
+    opacity: 0.03;
+    z-index: -1;
+}
+
+svg.Icon {
+    height: 150px;
+    width: 150px;
+    position: relative;
+    top: -6px;
+    z-index: -1;
+    opacity: 1;
+}
+
 #initialScreen div {
     display: flex;
     flex-direction: column;
+}
+
+.logo {
+    margin: 20px;
 }
 
 #gameScreen {
