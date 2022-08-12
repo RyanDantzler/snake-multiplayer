@@ -36,6 +36,10 @@ const playerScore = document.getElementById('playerScore');
 const opponentScore = document.getElementById('opponentScore');
 const rematchButton = document.getElementById('rematchButton');
 
+document.ondblclick = function(e) {
+    e.preventDefault();
+}
+
 newGameBtn.addEventListener('click', newGame);
 joinGameBtn.addEventListener('click', joinGame);
 rematchButton.addEventListener('click', handleRematch);

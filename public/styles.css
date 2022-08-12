@@ -1,6 +1,12 @@
 /* disable double-tap zoom */
 * {
     touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none; 
 }
 
 html {
@@ -11,7 +17,6 @@ html {
 html, body {
     height: 100%;
     width: 100%;
-    user-select: none;
 }
 
 body {
