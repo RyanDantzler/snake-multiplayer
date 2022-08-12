@@ -96,14 +96,14 @@ io.on('connection', client => {
 
 function startCountdown(roomId) {
     const intervalId = setInterval(() => {
-        if (state.countdown > -1) {
+        if (state[roomId].countdown > -1) {
             emitCountDown(roomId, state[roomId]);
         } else {
             clearInterval(intervalId);
             startGameInterval(roomId);
         }
 
-        state.countdown -= 1;
+        state[roomId].countdown -= 1;
     }, 1000);
 }
 

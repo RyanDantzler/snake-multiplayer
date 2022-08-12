@@ -84,7 +84,6 @@ function init() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (initialPaint) {
-        document.addEventListener('click', handleClick);
         document.addEventListener('keydown', handleKeydown);
         document.getElementById('btn-up').addEventListener('click', () => handleButtonClick('up'));
         document.getElementById('btn-down').addEventListener('click', () => handleButtonClick('down'));
@@ -93,10 +92,6 @@ function init() {
     }
 
     gameActive = true;
-}
-
-function handleClick(e) {
-    console.log(e);
 }
 
 function handleKeydown(e) {
@@ -169,6 +164,7 @@ function handleGameState(gameState) {
 }
 
 function handleCountdown(state) {
+    console.log("countdown message recieved.");
     state = JSON.parse(state);
     if (state.countdown == 3) {
         paintGame(state);
