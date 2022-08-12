@@ -54,7 +54,7 @@ io.on('connection', client => {
         client.number = 2;
         client.emit('init', 2);
 
-        startGameInterval(gameCode);
+        startCountdown(gameCode);
     }
 
     function handleRematch(gameCode) {
@@ -68,7 +68,7 @@ io.on('connection', client => {
         if (numClients == 2) {
             state[gameCode] = initGame();
             io.sockets.in(gameCode).emit('rematch');
-            startGameInterval(gameCode);
+            startCountdown(gameCode);
         }
     }
 
@@ -94,6 +94,19 @@ io.on('connection', client => {
     }
 });
 
+function startCountdown(roomId) {
+    const intervalId = setInterval(() => {
+        if (state.countdown > -1) {
+            emitCountDown(roomId, state[roomId]);
+        } else {
+            clearInterval(intervalId);
+            startGameInterval(roomId);
+        }
+
+        state.countdown -= 1;
+    }, 1000);
+}
+
 function startGameInterval(roomId) {
     const intervalId = setInterval(() => {
         const winner = gameLoop(state[roomId]);
@@ -106,6 +119,11 @@ function startGameInterval(roomId) {
             clearInterval(intervalId);
         }
     }, 1000 / FRAME_RATE);
+}
+
+function emitCountDown(roomId, state) {
+    io.sockets.in(roomId)
+        .emit('countdown', JSON.stringify(state));
 }
 
 function emitGameState(roomId, state) {

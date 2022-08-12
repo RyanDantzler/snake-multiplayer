@@ -15,12 +15,17 @@ html, body {
 }
 
 body {
-    margin: 12px 0 0 0;
+    margin: 0;
+    padding: 0;
     /* background: #aaa; */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
 }
 
 h1 {
-    margin: 7px;
+    padding: 0;
     font-size: 20px;
     font-family: monospace;
     text-transform: uppercase;
@@ -30,9 +35,16 @@ h1 {
 }
 
 h2 {
-    margin: 0;
+    margin: 0 0 10px 0;
     font-family: monospace;
     text-align: center;
+}
+
+hr {
+    border-width: 1px 0 0 0;
+    border-style: solid;
+    border-color: white;
+    margin: 25px 0 30px;
 }
 
 canvas {
@@ -40,18 +52,23 @@ canvas {
 }
 
 #initialScreen {
-    padding-top: 40px;
-    margin: 0 auto;
-    width: 200px;
     height: 420px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+}
+
+#initialScreen div {
+    display: flex;
+    flex-direction: column;
 }
 
 #gameScreen {
     display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
     padding: 7px;
 }
 
@@ -64,18 +81,9 @@ canvas {
     padding: 0 15px;
 }
 
-#newGameButton, #joinGameButton {
-    width: 100%;
+.button {
     height: 3rem;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
+    width: 272px;
     font-size: 1.1rem;
     color: white;
     background: #6d289b;
@@ -85,31 +93,13 @@ canvas {
     border-radius: 5px;
     -webkit-box-shadow: 0 0 5px rgb(0 0 0 / 30%);
     box-shadow: 0 0 5px rgb(0 0 0 / 30%);
-    max-width: 400px;
     border: none;
     cursor: pointer;
     box-sizing: border-box;
 }
 
-.textDiv {
-    color: white;
-    text-align: center;
-    padding-right: 10px;
-    margin: 15px 0 20px;
-}
-
 #gameCodeInput {
-    width: 100%;
     height: 3rem;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
     font-size: 1.1rem;
     font-family: 'Montserrat', sans-serif;
     font-weight: bold;
@@ -117,7 +107,6 @@ canvas {
     border-radius: 5px;
     -webkit-box-shadow: 0 0 5px rgb(0 0 0 / 30%);
     box-shadow: 0 0 5px rgb(0 0 0 / 30%);
-    max-width: 400px;
     border: none;
     cursor: pointer;
     padding: 0 20px;
@@ -129,43 +118,33 @@ canvas {
     display: none;
     position: absolute;
     bottom: 15px;
-    left: calc(50% - 2px);
-    transform: translateX(-50%);
-    width: 200px;
-    height: 3rem;
-    display: -webkit-box;
-    display: -ms-flexbox;
+}
+
+#gameArea {
     display: flex;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
     justify-content: center;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
     align-items: center;
-    font-size: 1.1rem;
+}
+
+#countdown {
     color: white;
-    background: #6d289b;
-    font-family: 'Montserrat', sans-serif;
+    position: absolute;
+    font-size: 80px;
     font-weight: bold;
-    letter-spacing: 0.8px;
-    border-radius: 5px;
-    -webkit-box-shadow: 0 0 5px rgb(0 0 0 / 30%);
-    box-shadow: 0 0 5px rgb(0 0 0 / 30%);
-    max-width: 400px;
-    border: none;
-    cursor: pointer;
+    font-family: monospace;
+    text-shadow: 1px 1px 12px rgba(54, 54, 54, 0.6);
+    z-index: 1;
 }
 
 .buttons {
     width: 126px;
-    margin: 0 auto;
+    height: 126px;
     position: relative;
+    margin: 12px 0;
 }
 
 .buttons button {
     position: absolute;
-    /* left: 50%;
-    transform: translateX(-50%); */
     width: 44px;
     height: 44px;
     font-size: 22px;
@@ -175,16 +154,40 @@ canvas {
     appearance: none;
     border: none;
     background: none;
-    text-align:center;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .buttons:after {
-    content: '\2022';
+    content: '';
+    position: absolute;
+    top: -1px;
+    z-index: 100;
+    left: -3px;
+    height: 132px;
+    width: 132px;
+    font-family: monospace;
+    color: #c3c3c3;
+    background: radial-gradient(circle, rgba(179,179,179,0.5) 0%, rgba(160,160,160,0) 30%, rgba(255,255,255,0) 100%),  url(https://ryandantzler.com/snake/multiplayer/x.svg);
+    background-position: center;
+    background-size: contain;
+    pointer-events: none;
+}
+
+.buttons:before {
     position: absolute;
     font-size: 40px;
-    opacity: 0.6;
-    top: 44px;
-    left: 56px;
+    top: 4px;
+    left: 4px;
+    content: '';
+    display: inline-block;
+    width: calc(100% - 8px);
+    height: 123px;
+    -moz-border-radius: 7.5px;
+    -webkit-border-radius: 7.5px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(179,179,179,1) 0%, rgba(160,160,160,1) 64%, rgba(255,255,255,1) 100%);
+    box-shadow: 0px 0px 8px rgba(0,0,0,0.5);
 }
 
 button#btn-left {
@@ -209,19 +212,13 @@ button#btn-up {
 }
 
 .container {
-    /* Center the content */
     align-items: center;
     display: flex;
     justify-content: center;
-
-    /* Spacing */
-    /* padding: 8px; */
 }
 
 .container__triangle {
     border-style: solid;
-
-    /* Size */
     height: 0px;
     width: 0px;
 }
@@ -229,19 +226,23 @@ button#btn-up {
 .container__triangle--up {
     border-color: transparent transparent rgba(0, 0, 0, 0.6);
     border-width: 0px 18px 18px;
+    /* border-color: transparent transparent white; */
 }
 
 .container__triangle--right {
     border-color: transparent transparent transparent rgba(0, 0, 0, 0.6);
     border-width: 18px 0px 18px 18px;
+    /* border-color: transparent transparent transparent white; */
 }
 
 .container__triangle--down {
     border-color: rgba(0, 0, 0, 0.6) transparent transparent;
     border-width: 18px 18px 0px;
+    /* border-color: white transparent transparent; */
 }
 
 .container__triangle--left {
     border-color: transparent rgba(0, 0, 0, 0.6) transparent transparent;
     border-width: 18px 18px 18px 0px;
+    /* border-color: transparent white transparent transparent; */
 }

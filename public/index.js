@@ -1,6 +1,7 @@
 const BG_COLOR = '#333';
 const FOOD_COLOR = '#faf';
 const SNAKE_COLOR = '#aff';
+const SNAKE_TWO_COLOR = '#ffcd00';
 let gameActive = false;
 let initialPaint = true;
 let gameRoom;
@@ -11,6 +12,7 @@ const socket = io('https://desolate-sea-20141.herokuapp.com/');
 
 socket.on('init', handleInit);
 socket.on('gameState', handleGameState);
+socket.on('countdown', handleCountdown);
 socket.on('gameOver', handleGameOver);
 socket.on('gameCode', handleGameCode);
 socket.on('unknownGame', handleUnknownGame);
@@ -23,6 +25,7 @@ const newGameBtn = document.getElementById('newGameButton');
 const joinGameBtn = document.getElementById('joinGameButton');
 const gameCodeInput = document.getElementById('gameCodeInput');
 const gameCodeDisplay = document.getElementById('gameCodeDisplay');
+const countdownDisplay = document.getElementById('countdown');
 const gameCode = document.getElementById('gameCode');
 const gameScore = document.getElementById('gameScore');
 const player1Score = document.getElementById('scoreOne');
@@ -55,6 +58,8 @@ function handleRematch() {
 
 function handleRestart() {
     init();
+    countdownDisplay.innerText = "";
+    countdownDisplay.style.display = "block";
 }
 
 let canvas, ctx;
@@ -62,7 +67,7 @@ let playerNumber;
 
 function init() {
     initialScreen.style.display = "none";
-    gameScreen.style.display = "block";
+    gameScreen.style.display = "flex";
     rematchButton.style.display = "none";
 
     canvas = document.getElementById('canvas');
@@ -147,7 +152,7 @@ function paintGame(state) {
     ctx.fillRect(food.x * size, food.y * size, size, size);
 
     paintPlayer(state.players[0], size, SNAKE_COLOR);
-    paintPlayer(state.players[1], size, 'blue');
+    paintPlayer(state.players[1], size, SNAKE_TWO_COLOR);
     updateScore(state);
 }
 
@@ -167,6 +172,22 @@ function handleGameState(gameState) {
 
     gameState = JSON.parse(gameState);
     requestAnimationFrame(() => paintGame(gameState));
+}
+
+function handleCountdown(state) {
+    state = JSON.parse(state);
+    if (state.countdown == 3) {
+        paintGame(state);
+    }
+
+    if (state.countdown > 0) {
+        countdownDisplay.innerText = state.countdown;
+    } else {
+        countdownDisplay.innerText = 'GO';
+        setTimeout(() => {
+            countdownDisplay.style.display = "none";
+        }, 1000);
+    }
 }
 
 function handleGameOver(data) {
@@ -220,7 +241,7 @@ function reset() {
     playerNumber = null;
     gameCodeInput.value = "";
     gameCodeDisplay.innerText = "";
-    initialScreen.style.display = "block";
+    initialScreen.style.display = "flex";
     gameScreen.style.display = "none";
 }
 

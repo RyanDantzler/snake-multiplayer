@@ -26,19 +26,28 @@ function createGameState() {
       score: 0
     },
     {
+    //   pos: {
+    //     x: 15,
+    //     y: 12,
+    //   },
       pos: {
-        x: 15,
-        y: 12,
+        x: 25,
+        y: 22,
       },
       vel: {
         x: -1,
         y: 0
       },
       lastDirection: 'left',
+    //   snake: [
+    //     { x: 17, y: 12 },
+    //     { x: 16, y: 12 },
+    //     { x: 15, y: 12 }
+    //   ],
       snake: [
-        { x: 17, y: 12 },
-        { x: 16, y: 12 },
-        { x: 15, y: 12 }
+        { x: 27, y: 22 },
+        { x: 26, y: 22 },
+        { x: 25, y: 22 }
       ],
       score: 0
     }],
@@ -46,7 +55,8 @@ function createGameState() {
       x: 0,
       y: 0
     },
-    gridsize: GRID_SIZE
+    gridsize: GRID_SIZE,
+    countdown: 3
   };
 }
 

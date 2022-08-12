@@ -8,21 +8,24 @@
     <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-    <h1>Multiplayer Snake</h1>
     <div id="initialScreen">
-        <button type="submit" id="newGameButton">Create New Game</button>
-        <div class="textDiv">OR</div>
-        <input type="text" placeholder="Enter Game Code" id="gameCodeInput"/>
-        <button type="submit" id="joinGameButton">Join Game</button>
+        <h1>Multiplayer Snake</h1>
+        <div>
+            <button type="submit" id="newGameButton" class="button">Create New Game</button>
+            <hr>
+            <input type="text" placeholder="Enter Game Code" id="gameCodeInput"/>
+            <button type="submit" id="joinGameButton" class="button">Join Game</button>
+        </div>
     </div>
 
     <div id="gameScreen">
-        <h2 id="gameCode">Your game code is: <span id="gameCodeDisplay"></span></h2>
+        <h2 id="gameCode">Game code: <span id="gameCodeDisplay"></span></h2>
         <h2 id="gameScore">
             <div>Player 1: <span id="scoreOne">0</span></div> 
             <div>Player 2: <span id="scoreTwo">0</span></div>
         </h2>
-        <div>
+        <div id="gameArea">
+            <span id="countdown"></span>
             <canvas id="canvas"></canvas>
         </div>
         <div class="buttons">
@@ -31,7 +34,7 @@
             <button id="btn-right" class="container"><div class="container__triangle container__triangle--right"></div></button>
             <button id="btn-down" class="container"><div class="container__triangle container__triangle--down"></div></button> 
         </div>
-        <button id="rematchButton">Rematch</button>
+        <button id="rematchButton" class="button">Rematch</button>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
