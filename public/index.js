@@ -15,18 +15,26 @@ let player2Color;
 const socket = io('https://desolate-sea-20141.herokuapp.com/');
 
 socket.on('init', handleInit);
+socket.on('gameLobbies', handleGameLobbies);
 socket.on('gameState', handleGameState);
 socket.on('countdown', handleCountdown);
 socket.on('gameOver', handleGameOver);
-socket.on('gameCode', handleGameCode);
 socket.on('unknownGame', handleUnknownGame);
 socket.on('tooManyPlayers', handleTooManyPlayers);
 socket.on('rematch', handleRestart);
 
 const gameScreen = document.getElementById('gameScreen');
 const initialScreen = document.getElementById('initialScreen');
+const createGameScreen = document.getElementById('createGameScreen');
+const createGameBtn = document.getElementById('createGameButton');
+const createGameBackBtn = document.getElementById('createGameBackButton');
+const lobbyNameInput = document.getElementById('lobbyNameInput');
+const browseGamesScreen = document.getElementById('browseGamesScreen');
+const browseGamesBtn = document.getElementById('browseGamesButton');
+const browseGamesBackBtn = document.getElementById('browseGamesBackButton');
+const lobbyList = document.getElementById('lobby-list');
 const newGameBtn = document.getElementById('newGameButton');
-const joinGameBtn = document.getElementById('joinGameButton');
+const joinGameBtn = document.querySelector('.joinGameButton');
 const gameCodeInput = document.getElementById('gameCodeInput');
 const gameCodeDisplay = document.getElementById('gameCodeDisplay');
 const countdownDisplay = document.getElementById('countdown');
@@ -41,16 +49,84 @@ document.ondblclick = function(e) {
 }
 
 newGameBtn.addEventListener('click', newGame);
-joinGameBtn.addEventListener('click', joinGame);
+browseGamesBtn.addEventListener('click', browseGames);
+browseGamesBackBtn.addEventListener('click', browseGames);
+createGameBtn.addEventListener('click', createGame);
+createGameBackBtn.addEventListener('click', createGame);
+lobbyNameInput.addEventListener('change', lobbyNameChanged);
 rematchButton.addEventListener('click', handleRematch);
 
 function newGame() {
-    socket.emit('newGame');
+    createGameScreen.style.display = "none";
+    socket.emit('newGame', lobbyNameInput.value);
     init();
 }
 
-function joinGame() {
-    const code = gameCodeInput.value;
+function browseGames() {
+    socket.emit('getGameLobbies');
+    console.log("emit getGameLobbies");
+    initialScreen.classList.toggle('hidden');
+    browseGamesScreen.classList.toggle('hidden');
+}
+
+function createGame() {
+    initialScreen.classList.toggle('hidden');
+    createGameScreen.classList.toggle('hidden');
+}
+
+function lobbyNameChanged() {
+    if (lobbyNameInput.value != '') {
+        newGameBtn.disabled = false;
+    } else {
+        newGameBtn.disabled = true;
+    }
+}
+
+function handleGameLobbies(data) {
+    data = JSON.parse(data);
+    let list = '';
+
+    for (let lobby of Object.keys(data)) {
+        if (data[lobby]) {
+            list += `<div class="lobby-item">`
+            + `<h3>${data[lobby].name}</h3>`
+            + `<div class="lobby-details">`
+            + `<button type="submit" class="button joinGameButton" data-value=${lobby}>Join Game</button>`
+            + `</div>`;
+        }
+    }
+
+    if (list == '') {
+        list = '<h2>No Games Found</h2>';
+    }
+
+    lobbyList.innerHTML = list;
+
+    const lobbyItems = document.querySelectorAll('.lobby-item');
+    
+    lobbyItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            const selected = document.querySelector('.selected');
+            if (selected)
+                selected.classList.remove('selected');
+
+            if (selected !== e.currentTarget)
+                e.currentTarget.classList.toggle('selected');
+        });
+    });
+
+    const joinGameBtns = document.querySelectorAll('.joinGameButton');
+
+    joinGameBtns.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            joinGame(e.currentTarget.dataset.value)
+        });
+    });
+}
+
+function joinGame(code) {
+    console.log(code);
     socket.emit('joinGame', code);
     gameRoom = code;
     init();
@@ -72,6 +148,8 @@ function handleRestart() {
 
 function init() {
     initialScreen.style.display = "none";
+    createGameScreen.style.display = "none";
+    browseGamesScreen.style.display = "none";
     gameScreen.style.display = "flex";
     rematchButton.style.visibility = "hidden";
 
@@ -165,6 +243,7 @@ function handleGameState(gameState) {
 
 function handleCountdown(state) {
     console.log("countdown message recieved.");
+    countdownDisplay.classList.remove('loading');
     state = JSON.parse(state);
     if (state.countdown == 3) {
         paintGame(state);

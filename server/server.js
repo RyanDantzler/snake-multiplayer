@@ -19,13 +19,14 @@ io.on('connection', client => {
     client.on('newGame', handleNewGame);
     client.on('joinGame', handleJoinGame);
     client.on('rematchGame', handleRematch);
+    client.on('getGameLobbies', handleGetGameLobbies);
 
-    function handleNewGame() {
-        let roomId = generateRoomId(5);
+    function handleNewGame(lobbyName) {
+        let roomId = generateRoomId(8);
         clientRooms[client.id] = roomId;
         client.emit('gameCode', roomId);
 
-        state[roomId] = initGame();
+        state[roomId] = initGame(lobbyName);
 
         client.join(roomId);
         client.number = 1;
@@ -55,6 +56,10 @@ io.on('connection', client => {
         client.emit('init', 2);
 
         startCountdown(gameCode);
+    }
+
+    function handleGetGameLobbies() {
+        emitGameLobbies(client);
     }
 
     function handleRematch(gameCode) {
@@ -129,6 +134,10 @@ function emitCountDown(roomId, state) {
 function emitGameState(roomId, state) {
     io.sockets.in(roomId)
         .emit('gameState', JSON.stringify(state));
+}
+
+function emitGameLobbies(client) {
+    client.emit('gameLobbies', JSON.stringify(state));
 }
 
 function emitGameOver(roomId, winner) {
