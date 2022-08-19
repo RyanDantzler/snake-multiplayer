@@ -21,20 +21,28 @@ io.on('connection', client => {
     client.on('rematchGame', handleRematch);
     client.on('getGameLobbies', handleGetGameLobbies);
 
-    function handleNewGame(lobbyName) {
+    function handleNewGame(game) {
+        game = JSON.parse(game);
         let roomId = generateRoomId(8);
         clientRooms[client.id] = roomId;
         client.emit('gameCode', roomId);
 
-        state[roomId] = initGame(lobbyName);
+        state[roomId] = initGame(game.name, game.password);
 
         client.join(roomId);
         client.number = 1;
         client.emit('init', 1);
     }
 
-    function handleJoinGame(gameCode) {
-        const room = io.sockets.adapter.rooms.get(gameCode);
+    function handleJoinGame(game) {
+        game = JSON.parse(game);
+
+        if (state[game.code].password !== game.password) {
+            client.emit('incorrectPassword');
+            return;
+        }
+
+        const room = io.sockets.adapter.rooms.get(game.code);
 
         let numClients = 0;
         if (room) {
@@ -49,13 +57,13 @@ io.on('connection', client => {
             return;
         }
 
-        clientRooms[client.id] = gameCode;
+        clientRooms[client.id] = game.code;
 
-        client.join(gameCode);
+        client.join(game.code);
         client.number = 2;
         client.emit('init', 2);
 
-        startCountdown(gameCode);
+        startCountdown(game.code);
     }
 
     function handleGetGameLobbies() {

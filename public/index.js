@@ -21,6 +21,7 @@ socket.on('countdown', handleCountdown);
 socket.on('gameOver', handleGameOver);
 socket.on('unknownGame', handleUnknownGame);
 socket.on('tooManyPlayers', handleTooManyPlayers);
+socket.on('incorrectPassword', handleIncorrectPassword);
 socket.on('rematch', handleRestart);
 
 const gameScreen = document.getElementById('gameScreen');
@@ -29,6 +30,8 @@ const createGameScreen = document.getElementById('createGameScreen');
 const createGameBtn = document.getElementById('createGameButton');
 const createGameBackBtn = document.getElementById('createGameBackButton');
 const lobbyNameInput = document.getElementById('lobbyNameInput');
+const passwordReqCheckbox = document.getElementById('password-req');
+const passwordSetInput = document.getElementById('setPasswordInput');
 const browseGamesScreen = document.getElementById('browseGamesScreen');
 const browseGamesBtn = document.getElementById('browseGamesButton');
 const browseGamesBackBtn = document.getElementById('browseGamesBackButton');
@@ -53,13 +56,18 @@ browseGamesBtn.addEventListener('click', browseGames);
 browseGamesBackBtn.addEventListener('click', browseGames);
 createGameBtn.addEventListener('click', createGame);
 createGameBackBtn.addEventListener('click', createGame);
-lobbyNameInput.addEventListener('change', lobbyNameChanged);
+lobbyNameInput.addEventListener('input', lobbyNameChanged);
+passwordReqCheckbox.addEventListener('change', checkboxChecked);
 rematchButton.addEventListener('click', handleRematch);
 
 function newGame() {
     createGameScreen.style.display = "none";
-    socket.emit('newGame', lobbyNameInput.value);
-    init();
+    const game = {
+        name: lobbyNameInput.value,
+        password: passwordSetInput.value
+    }
+    socket.emit('newGame', JSON.stringify(game));
+    // init();
 }
 
 function browseGames() {
@@ -82,17 +90,27 @@ function lobbyNameChanged() {
     }
 }
 
+function checkboxChecked(e) {
+    if (e.currentTarget.checked) {
+        passwordSetInput.disabled = false;
+    } else {
+        passwordSetInput.disabled = true;
+    }
+}
+
 function handleGameLobbies(data) {
     data = JSON.parse(data);
     let list = '';
 
     for (let lobby of Object.keys(data)) {
         if (data[lobby]) {
-            list += `<div class="lobby-item">`
+            list += `<div class="lobby-item ${data[lobby].password !== '' ? 'password-protected' : 'no-password'}">`
             + `<h3>${data[lobby].name}</h3>`
             + `<div class="lobby-details">`
+            + `<input type="text" placeholder="Password" class="passwordInput"/>`
             + `<button type="submit" class="button joinGameButton" data-value=${lobby}>Join Game</button>`
-            + `</div>`;
+            + `</div>`
+            + `</div>`
         }
     }
 
@@ -101,6 +119,14 @@ function handleGameLobbies(data) {
     }
 
     lobbyList.innerHTML = list;
+
+    const passwordInputs = document.querySelectorAll('.passwordInput');
+
+    passwordInputs.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    });
 
     const lobbyItems = document.querySelectorAll('.lobby-item');
     
@@ -120,16 +146,20 @@ function handleGameLobbies(data) {
     joinGameBtns.forEach(item => {
         item.addEventListener('click', (e) => {
             e.stopPropagation();
-            joinGame(e.currentTarget.dataset.value)
+            joinGame(e.currentTarget.dataset.value, item.previousElementSibling.value)
         });
     });
 }
 
-function joinGame(code) {
-    console.log(code);
-    socket.emit('joinGame', code);
+function joinGame(code, password) {
+    console.log(code, password);
+    const game = {
+        code: code,
+        password: password
+    }
+    socket.emit('joinGame', JSON.stringify(game));
     gameRoom = code;
-    init();
+    // init();
 }
 
 function handleRematch() {
@@ -137,7 +167,7 @@ function handleRematch() {
     opponentScore.innerText = 0;
 
     socket.emit('rematchGame', gameRoom);
-    init();
+    // init();
 }
 
 function handleRestart() {
@@ -298,6 +328,10 @@ function handleTooManyPlayers() {
     alert("This game is already in progress.");
 }
 
+function handleIncorrectPassword() {
+    alert("Password Incorrect");
+}
+
 function updateScore(state) {
     if (playerNumber == 1) {
         playerScore.innerText = state.players[0].score;
@@ -319,4 +353,5 @@ function reset() {
 
 function handleInit(number) {
     playerNumber = number;
+    init();
 }

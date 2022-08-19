@@ -1,14 +1,15 @@
 const { GRID_SIZE } = require('./constants');
 
-function initGame(name) {
-  const state = createGameState(name);
+function initGame(name, password) {
+  const state = createGameState(name, password);
   randomFood(state);
   return state;
 }
 
-function createGameState(name) {
+function createGameState(name, password) {
   return {
     name: name,
+    password: password,
     players: [{
       pos: {
         x: 5,

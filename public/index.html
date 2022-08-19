@@ -25,6 +25,14 @@
             <button type="submit" id="createGameBackButton" class="button">Back</button>
             <hr>
             <input type="text" placeholder="Lobby Name" id="lobbyNameInput" required/>
+            <div class="form-container">
+                <label class="switch">
+                    <input type="checkbox" id="password-req">
+                    <span class="slider round"></span>
+                </label>
+                <p class="label">Password Required</p>
+            </div>
+            <input type="text" placeholder="Password" id="setPasswordInput" disabled/>
             <button type="submit" id="newGameButton" class="button" disabled>Create Lobby</button>
         </div>
     </div>
@@ -37,6 +45,7 @@
                 <div class="lobby-item">
                     <h3>Ryan's Game</h3>
                     <div class="lobby-details">
+                        <input type="text" placeholder="Password" class="passwordInput"/>
                         <button type="submit" class="button joinGameButton">Join Game</button>
                     </div>
                 </div>
