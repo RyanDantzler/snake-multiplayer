@@ -67,7 +67,6 @@ function newGame() {
         password: passwordSetInput.value
     }
     socket.emit('newGame', JSON.stringify(game));
-    // init();
 }
 
 function browseGames() {
@@ -95,6 +94,7 @@ function checkboxChecked(e) {
         passwordSetInput.disabled = false;
     } else {
         passwordSetInput.disabled = true;
+        passwordSetInput.value = '';
     }
 }
 
@@ -159,7 +159,6 @@ function joinGame(code, password) {
     }
     socket.emit('joinGame', JSON.stringify(game));
     gameRoom = code;
-    // init();
 }
 
 function handleRematch() {
@@ -167,7 +166,6 @@ function handleRematch() {
     opponentScore.innerText = 0;
 
     socket.emit('rematchGame', gameRoom);
-    // init();
 }
 
 function handleRestart() {

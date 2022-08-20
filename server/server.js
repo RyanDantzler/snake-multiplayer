@@ -1,12 +1,18 @@
 const { createServer } = require('http');
+const { instrument } = require("@socket.io/admin-ui");
 
 const httpServer = createServer();
 const io = require('socket.io')(httpServer, {
     cors: {
-        credentials: true,
-        origin: "https://boisterous-syrniki-4eeaa2.netlify.app"
+        origin: ["https://boisterous-syrniki-4eeaa2.netlify.app", "https://admin.socket.io"],
+        credentials: true
       }
 });
+
+instrument(io, {
+    auth: false
+  });
+
 const { initGame, gameLoop, getUpdatedVelocity } = require('./game');
 const { FRAME_RATE } = require('./constants');
 const { generateRoomId } = require('./utils');
