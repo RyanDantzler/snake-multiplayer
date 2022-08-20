@@ -14,72 +14,53 @@ let player2Color;
 
 const socket = io('https://desolate-sea-20141.herokuapp.com/');
 
-socket.on('init', handleInit);
+socket.on('initGame', handleInitGame);
 socket.on('gameLobbies', handleGameLobbies);
+socket.on('gameCode', handleGameCode);
 socket.on('gameState', handleGameState);
 socket.on('countdown', handleCountdown);
 socket.on('gameOver', handleGameOver);
 socket.on('unknownGame', handleUnknownGame);
 socket.on('tooManyPlayers', handleTooManyPlayers);
 socket.on('incorrectPassword', handleIncorrectPassword);
-socket.on('rematch', handleRestart);
+socket.on('rematch', handleRematch);
 
-const gameScreen = document.getElementById('gameScreen');
+// ----------------------------------------------------------
+// initial screen
+// ----------------------------------------------------------
 const initialScreen = document.getElementById('initialScreen');
-const createGameScreen = document.getElementById('createGameScreen');
 const createGameBtn = document.getElementById('createGameButton');
-const createGameBackBtn = document.getElementById('createGameBackButton');
-const lobbyNameInput = document.getElementById('lobbyNameInput');
-const passwordReqCheckbox = document.getElementById('password-req');
-const passwordSetInput = document.getElementById('setPasswordInput');
-const browseGamesScreen = document.getElementById('browseGamesScreen');
 const browseGamesBtn = document.getElementById('browseGamesButton');
-const browseGamesBackBtn = document.getElementById('browseGamesBackButton');
-const lobbyList = document.getElementById('lobby-list');
-const newGameBtn = document.getElementById('newGameButton');
-const joinGameBtn = document.querySelector('.joinGameButton');
-const gameCodeInput = document.getElementById('gameCodeInput');
-const gameCodeDisplay = document.getElementById('gameCodeDisplay');
-const countdownDisplay = document.getElementById('countdown');
-const gameCode = document.getElementById('gameCode');
-const gameScore = document.getElementById('gameScore');
-const playerScore = document.getElementById('playerScore');
-const opponentScore = document.getElementById('opponentScore');
-const rematchButton = document.getElementById('rematchButton');
 
-document.ondblclick = function(e) {
-    e.preventDefault();
-}
-
-newGameBtn.addEventListener('click', newGame);
-browseGamesBtn.addEventListener('click', browseGames);
-browseGamesBackBtn.addEventListener('click', browseGames);
 createGameBtn.addEventListener('click', createGame);
-createGameBackBtn.addEventListener('click', createGame);
-lobbyNameInput.addEventListener('input', lobbyNameChanged);
-passwordReqCheckbox.addEventListener('change', checkboxChecked);
-rematchButton.addEventListener('click', handleRematch);
-
-function newGame() {
-    createGameScreen.style.display = "none";
-    const game = {
-        name: lobbyNameInput.value,
-        password: passwordSetInput.value
-    }
-    socket.emit('newGame', JSON.stringify(game));
-}
-
-function browseGames() {
-    socket.emit('getGameLobbies');
-    console.log("emit getGameLobbies");
-    initialScreen.classList.toggle('hidden');
-    browseGamesScreen.classList.toggle('hidden');
-}
+browseGamesBtn.addEventListener('click', browseGames);
 
 function createGame() {
     initialScreen.classList.toggle('hidden');
     createGameScreen.classList.toggle('hidden');
 }
+
+function browseGames() {
+    socket.emit('getGameLobbies');
+
+    initialScreen.classList.toggle('hidden');
+    browseGamesScreen.classList.toggle('hidden');
+}
+
+// ----------------------------------------------------------
+// create game screen
+// ----------------------------------------------------------
+const createGameScreen = document.getElementById('createGameScreen');
+const createGameBackBtn = document.getElementById('createGameBackButton');
+const lobbyNameInput = document.getElementById('lobbyNameInput');
+const passwordReqCheckbox = document.getElementById('password-req');
+const passwordSetInput = document.getElementById('setPasswordInput');
+const newGameBtn = document.getElementById('newGameButton');
+
+createGameBackBtn.addEventListener('click', createGame);
+lobbyNameInput.addEventListener('input', lobbyNameChanged);
+passwordReqCheckbox.addEventListener('change', checkboxChecked);
+newGameBtn.addEventListener('click', newGame);
 
 function lobbyNameChanged() {
     if (lobbyNameInput.value != '') {
@@ -98,6 +79,51 @@ function checkboxChecked(e) {
     }
 }
 
+function newGame() {
+    const game = {
+        name: lobbyNameInput.value,
+        password: passwordSetInput.value
+    }
+    socket.emit('newGame', JSON.stringify(game));
+}
+
+// ----------------------------------------------------------
+// browse games screen
+// ----------------------------------------------------------
+const browseGamesScreen = document.getElementById('browseGamesScreen');
+const browseGamesBackBtn = document.getElementById('browseGamesBackButton');
+const lobbyList = document.getElementById('lobby-list');
+
+browseGamesBackBtn.addEventListener('click', browseGames);
+
+// ----------------------------------------------------------
+// game screen
+// ----------------------------------------------------------
+const gameScreen = document.getElementById('gameScreen');
+const gameInfo = document.getElementById('gameInfo');
+const gameScore = document.getElementById('gameScore');
+const countdownDisplay = document.getElementById('countdown');
+const playerScore = document.getElementById('playerScore');
+const opponentScore = document.getElementById('opponentScore');
+const rematchButton = document.getElementById('rematchButton');
+
+rematchButton.addEventListener('click', rematchGame);
+
+function rematchGame() {
+    playerScore.innerText = 0;
+    opponentScore.innerText = 0;
+
+    socket.emit('rematchGame', gameRoom);
+}
+
+// prevent double-tap zoom
+document.ondblclick = function(e) {
+    e.preventDefault();
+}
+
+// ----------------------------------------------------------
+// server broadcast handlers
+// ----------------------------------------------------------
 function handleGameLobbies(data) {
     data = JSON.parse(data);
     let list = '';
@@ -152,7 +178,6 @@ function handleGameLobbies(data) {
 }
 
 function joinGame(code, password) {
-    console.log(code, password);
     const game = {
         code: code,
         password: password
@@ -161,103 +186,9 @@ function joinGame(code, password) {
     gameRoom = code;
 }
 
-function handleRematch() {
-    playerScore.innerText = 0;
-    opponentScore.innerText = 0;
-
-    socket.emit('rematchGame', gameRoom);
-}
-
-function handleRestart() {
-    init();
-    countdownDisplay.innerText = "";
-    countdownDisplay.style.display = "block";
-}
-
-function init() {
-    initialScreen.style.display = "none";
-    createGameScreen.style.display = "none";
-    browseGamesScreen.style.display = "none";
-    gameScreen.style.display = "flex";
-    rematchButton.style.visibility = "hidden";
-
-    canvas = document.getElementById('canvas');
-    ctx = canvas.getContext('2d');
-
-    canvas.width = canvas.height = 600;
-
-    ctx.fillStyle = BG_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    if (initialPaint) {
-        document.addEventListener('keydown', handleKeydown);
-        document.getElementById('btn-up').addEventListener('click', () => handleButtonClick('up'));
-        document.getElementById('btn-down').addEventListener('click', () => handleButtonClick('down'));
-        document.getElementById('btn-left').addEventListener('click', () => handleButtonClick('left'));
-        document.getElementById('btn-right').addEventListener('click', () => handleButtonClick('right'));
-    }
-
-    gameActive = true;
-}
-
-function handleKeydown(e) {
-    socket.emit('keydown', e.keyCode);
-}
-
-function handleButtonClick(direction) {
-    let keycode = 0;
-
-    switch (direction) {
-        case 'left':
-            keycode = 37;
-            break;
-        case 'up':
-            keycode = 38;
-            break;
-        case 'right':
-            keycode = 39;
-            break;
-        case 'down':
-            keycode = 40;
-            break;
-        default:
-            break;
-    }
-
-    socket.emit('keydown', keycode);
-}
-
-function paintGame(state) {
-    if (initialPaint) {
-        gameCode.style.display = "none";
-        gameScore.style.display = "block";
-        initialPaint = false;
-        player1Color = playerNumber == 1 ? SNAKE_PLAYER_COLOR : SNAKE_OPPONENT_COLOR;
-        player2Color = playerNumber == 2 ? SNAKE_PLAYER_COLOR : SNAKE_OPPONENT_COLOR;
-    }
-
-    ctx.fillStyle = BG_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const food = state.food;
-    const gridsize = state.gridsize;
-    const size = canvas.width / gridsize;
-
-    ctx.fillStyle = FOOD_COLOR;
-    ctx.fillRect(food.x * size, food.y * size, size, size);
-
-    paintPlayer(state.players[0], size, player1Color);
-    paintPlayer(state.players[1], size, player2Color);
-    updateScore(state);
-}
-
-function paintPlayer(playerState, size, color) {
-    const snake = playerState.snake;
-
-    ctx.fillStyle = color;
-    for (let cell of snake) {
-        ctx.fillRect(cell.x * size, cell.y * size, size, size);
-    }
+function handleInitGame(number) {
+    playerNumber = number;
+    initGame();
 }
 
 function handleGameState(gameState) {
@@ -270,7 +201,6 @@ function handleGameState(gameState) {
 }
 
 function handleCountdown(state) {
-    console.log("countdown message recieved.");
     countdownDisplay.classList.remove('loading');
     state = JSON.parse(state);
     if (state.countdown == 3) {
@@ -312,7 +242,6 @@ function handleGameOver(data) {
 }
 
 function handleGameCode(gameCode) {
-    gameCodeDisplay.innerText = gameCode;
     gameRoom = gameCode;
 }
 
@@ -330,6 +259,74 @@ function handleIncorrectPassword() {
     alert("Password Incorrect");
 }
 
+function handleRematch() {
+    initGame();
+    countdownDisplay.innerText = "";
+    countdownDisplay.style.display = "block";
+}
+
+// ----------------------------------------------------------
+// game functions
+// ----------------------------------------------------------
+function initGame() {
+    initialScreen.style.display = "none";
+    createGameScreen.style.display = "none";
+    browseGamesScreen.style.display = "none";
+    gameScreen.style.display = "flex";
+    rematchButton.style.visibility = "hidden";
+
+    canvas = document.getElementById('canvas');
+    ctx = canvas.getContext('2d');
+
+    canvas.width = canvas.height = 600;
+
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (initialPaint) {
+        document.addEventListener('keydown', handleKeydown);
+        document.getElementById('btn-up').addEventListener('click', () => handleButtonClick('up'));
+        document.getElementById('btn-down').addEventListener('click', () => handleButtonClick('down'));
+        document.getElementById('btn-left').addEventListener('click', () => handleButtonClick('left'));
+        document.getElementById('btn-right').addEventListener('click', () => handleButtonClick('right'));
+    }
+
+    gameActive = true;
+}
+
+function paintGame(state) {
+    if (initialPaint) {
+        gameInfo.style.display = "none";
+        gameScore.style.display = "block";
+        initialPaint = false;
+        player1Color = playerNumber == 1 ? SNAKE_PLAYER_COLOR : SNAKE_OPPONENT_COLOR;
+        player2Color = playerNumber == 2 ? SNAKE_PLAYER_COLOR : SNAKE_OPPONENT_COLOR;
+    }
+
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const food = state.food;
+    const gridsize = state.gridsize;
+    const size = canvas.width / gridsize;
+
+    ctx.fillStyle = FOOD_COLOR;
+    ctx.fillRect(food.x * size, food.y * size, size, size);
+
+    paintPlayer(state.players[0], size, player1Color);
+    paintPlayer(state.players[1], size, player2Color);
+    updateScore(state);
+}
+
+function paintPlayer(playerState, size, color) {
+    const snake = playerState.snake;
+
+    ctx.fillStyle = color;
+    for (let cell of snake) {
+        ctx.fillRect(cell.x * size, cell.y * size, size, size);
+    }
+}
+
 function updateScore(state) {
     if (playerNumber == 1) {
         playerScore.innerText = state.players[0].score;
@@ -343,13 +340,36 @@ function updateScore(state) {
 
 function reset() {
     playerNumber = null;
-    gameCodeInput.value = "";
-    gameCodeDisplay.innerText = "";
     initialScreen.style.display = "flex";
     gameScreen.style.display = "none";
 }
 
-function handleInit(number) {
-    playerNumber = number;
-    init();
+// ----------------------------------------------------------
+// client input handlers
+// ----------------------------------------------------------
+function handleKeydown(e) {
+    socket.emit('keydown', e.keyCode);
+}
+
+function handleButtonClick(direction) {
+    let keycode = 0;
+
+    switch (direction) {
+        case 'left':
+            keycode = 37;
+            break;
+        case 'up':
+            keycode = 38;
+            break;
+        case 'right':
+            keycode = 39;
+            break;
+        case 'down':
+            keycode = 40;
+            break;
+        default:
+            break;
+    }
+
+    socket.emit('keydown', keycode);
 }

@@ -9,10 +9,6 @@ const io = require('socket.io')(httpServer, {
       }
 });
 
-instrument(io, {
-    auth: false
-  });
-
 const { initGame, gameLoop, getUpdatedVelocity } = require('./game');
 const { FRAME_RATE } = require('./constants');
 const { generateRoomId } = require('./utils');
@@ -37,7 +33,7 @@ io.on('connection', client => {
 
         client.join(roomId);
         client.number = 1;
-        client.emit('init', 1);
+        client.emit('initGame', 1);
     }
 
     function handleJoinGame(game) {
@@ -67,7 +63,7 @@ io.on('connection', client => {
 
         client.join(game.code);
         client.number = 2;
-        client.emit('init', 2);
+        client.emit('initGame', 2);
 
         startCountdown(game.code);
     }
@@ -158,5 +154,9 @@ function emitGameOver(roomId, winner) {
     io.sockets.in(roomId)
         .emit('gameOver', JSON.stringify({ winner }));
 }
+
+instrument(io, {
+    auth: false
+  });
 
 httpServer.listen(process.env.PORT || 3000);
