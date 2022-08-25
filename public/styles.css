@@ -282,6 +282,12 @@ svg.Icon {
     width: 100%;
     touch-action: auto;
     background: transparent;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+#lobby-list::-webkit-scrollbar {
+    display: none;
 }
 
 .password-protected h3:after {
@@ -330,6 +336,10 @@ svg.Icon {
 
 .selected.no-password .lobby-details {
     height: 78px;
+}
+
+.joinGameButton {
+    margin-top: 2px;
 }
 
 .logo {
